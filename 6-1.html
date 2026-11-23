@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Polygon Exercises 17–24</title>
+<style>
+:root{--bg:#f3f6fb;--surface:#fff;--ink:#14213d;--muted:#5a6688;--line:#d8dfee;--accent:#2457c5;--accent-soft:#e3ebfb;--accent-ink:#fff;--good:#1b7a45;--good-soft:#def3e6;--bad:#b3261e;--bad-soft:#fbe5e3;--warn:#9a5b00;--warn-soft:#fbecd2;--font:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+@media (prefers-color-scheme:dark){:root{--bg:#0e1526;--surface:#161e33;--ink:#e8edf9;--muted:#9aa7c7;--line:#2a3556;--accent:#7ea6ff;--accent-soft:#1f2e55;--accent-ink:#0e1526;--good:#5fd38d;--good-soft:#15352a;--bad:#ff8a80;--bad-soft:#3d1f22;--warn:#f0b45a;--warn-soft:#3b2e14;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--font);padding:20px max(16px,env(safe-area-inset-right,0px)) 40px max(16px,env(safe-area-inset-left,0px))}
+.shell{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+h1,h2{margin:0}
+.top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:10px 24px}
+.top h1{font-size:clamp(1.5rem,2.4vw + 1rem,2.1rem);line-height:1.1}
+.top p{margin:4px 0 0;color:var(--muted)}
+.stats{display:flex;flex-wrap:wrap;gap:8px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:6px 12px;min-width:88px}
+.stat b{display:block;font-size:1.2rem;font-variant-numeric:tabular-nums}
+.stat span{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px}
+.who{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:12px 16px}
+.who label{font-weight:600}
+.who input{font:500 1rem var(--font);padding:9px 12px;border:1.5px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);flex:1 1 180px;max-width:280px;min-width:0}
+.sync{color:var(--muted);font-size:.85rem}
+.qhead{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 12px;margin-bottom:10px}
+.qnum{font-weight:700;font-size:1.1rem}
+.level{font-size:.78rem;color:var(--accent);background:var(--accent-soft);padding:3px 10px;border-radius:999px;font-weight:600}
+.prompt{font-size:1.15rem;font-weight:600;margin:0 0 8px}
+.fig{display:block;width:100%;max-width:380px;margin:4px auto 8px}
+.fig .poly{fill:var(--accent-soft);stroke:var(--accent);stroke-width:2.5;stroke-linejoin:round}
+.fig .dot{fill:var(--accent)}
+.fig text{fill:var(--ink);font:700 13px var(--font)}
+.note{font-size:.8rem;color:var(--muted);text-align:center;margin:0 0 4px}
+.row{display:flex;flex-direction:column;gap:6px;padding:12px 0;border-top:1px solid var(--line)}
+.row.off{opacity:.45}
+.inrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.inrow input{flex:1 1 140px;max-width:220px;min-width:0;font:600 1.1rem var(--font);padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink)}
+.inrow input:focus{border-color:var(--accent);outline:none}
+.unit{color:var(--muted);font-weight:600}
+.val{font-weight:700;font-size:1.1rem;color:var(--good);background:var(--good-soft);border-radius:10px;padding:8px 12px}
+.val.no{color:var(--bad);background:var(--bad-soft)}
+.fb{border-radius:10px;padding:9px 13px;font-size:.93rem;border:1px solid}
+.fb.bad{background:var(--bad-soft);border-color:var(--bad)}
+.fb.good{background:var(--good-soft);border-color:var(--good)}
+.btn{background:var(--accent);color:var(--accent-ink);border:0;border-radius:10px;padding:10px 20px;font:600 1rem var(--font);cursor:pointer;min-height:46px}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.btn:disabled{opacity:.6;cursor:default}
+.btn:focus-visible,.cell:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.done{display:flex;flex-direction:column;gap:10px;align-items:flex-start;border-top:1px solid var(--line);padding-top:12px}
+.lowerhead{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px}
+.lowerhead h2{font-size:1.1rem}
+.map{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:5px;max-width:520px}
+.cell{aspect-ratio:1;border-radius:6px;border:1.5px solid var(--line);background:transparent;color:var(--muted);font:600 .72rem var(--font);cursor:pointer;padding:0}
+.cell:disabled{opacity:.4;cursor:default}
+.cell.good{background:var(--good-soft);border-color:var(--good);color:var(--good)}
+.cell.warn{background:var(--warn-soft);border-color:var(--warn);color:var(--warn)}
+.cell.part{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.cell.cur{box-shadow:0 0 0 2.5px var(--ink)}
+.key{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.8rem;color:var(--muted);margin-top:10px}
+</style>
+</head>
+<body>
+<div class="shell">
+  <a href="./" style="color:var(--accent,#2457c5);font-weight:600;text-decoration:none;align-self:flex-start">← All pages</a>
+  <header class="top">
+    <div><h1>Polygon Exercises 17–24</h1><p>You get one try on each box. The page tells you if you are right or wrong, then you move on.</p></div>
+    <div class="stats" id="stats" aria-live="polite"></div>
+  </header>
+  <div class="card who">
+    <label for="sname">Your name</label>
+    <input id="sname" type="text" maxlength="60" autocomplete="name" placeholder="First and last name">
+    <button type="button" class="btn" id="send">Send my results to my teacher</button>
+    <span class="sync" id="sync" aria-live="polite"></span>
+  </div>
+  <section class="card">
+    <div class="qhead"><span class="qnum" id="qnum"></span><span class="level" id="level"></span></div>
+    <p class="prompt" id="prompt"></p>
+    <div id="fig"></div>
+    <div id="rows"></div>
+  </section>
+  <section class="card">
+    <div class="lowerhead"><h2>All 8 exercises</h2></div>
+    <div class="map" id="map"></div>
+    <div class="key"><span>Green: every box right</span><span>Yellow: at least one wrong</span><span>Blue: in progress</span></div>
+  </section>
+</div>
+<script>
+(function () {
+  // ---------- teacher setup: paste your Google Form link and field IDs here ----------
+  var FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLScHDDVpaSXyNp_6fwc2VgHT4Ge2-CLgt5_Tcl0PRrSPG0D3SA/formResponse";
+  var F_NAME = "entry.711275084", F_SCORE = "entry.1948245088", F_ANS = "entry.1424329923";
+
+  var M = "\u2212", N = 8, LEVELS = ["Practice: exercises 17\u201324"];
+  var DIV = [5, 6, 8, 9, 10, 12, 15, 18, 20, 24, 30, 36, 40, 45, 60, 72]; // numbers of sides (or exterior angles) that divide 360 evenly
+  function rng(seed) { return function () { seed |= 0; seed = seed + 0x6D2B79F5 | 0; var t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+  function ri(r, lo, hi) { return lo + Math.floor(r() * (hi - lo + 1)); }
+  function pick(r, a) { return a[Math.floor(r() * a.length)]; }
+  function shuffle(a, r) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(r() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+  function expr(a, b) { return "(" + (a === 1 ? "" : a) + "x " + (b < 0 ? M : "+") + " " + Math.abs(b) + ")\u00B0"; }
+
+  // ---------- figures ----------
+  function poly(n) {
+    var cx = 190, cy = 150, R = 100, pts = [];
+    for (var k = 0; k < n; k++) { var th = -Math.PI / 2 + k * 2 * Math.PI / n; pts.push((cx + R * Math.cos(th)).toFixed(1) + "," + (cy + R * Math.sin(th)).toFixed(1)); }
+    return '<svg class="fig" viewBox="0 0 380 300" role="img" aria-label="Regular polygon"><polygon class="poly" points="' + pts.join(" ") + '"/></svg>';
+  }
+  function shape(pts, labs) {
+    var xs = pts.map(function (p) { return p[0]; }), ys = pts.map(function (p) { return p[1]; }), ox = 220 - (Math.min.apply(0, xs) + Math.max.apply(0, xs)) / 2, oy = 150 - (Math.min.apply(0, ys) + Math.max.apply(0, ys)) / 2;
+    pts = pts.map(function (p) { return [p[0] + ox, p[1] + oy]; });
+    var cx = pts.reduce(function (a, p) { return a + p[0]; }, 0) / pts.length, cy = pts.reduce(function (a, p) { return a + p[1]; }, 0) / pts.length;
+    var s = '<svg class="fig" viewBox="0 0 440 300" role="img" aria-label="Polygon with labeled angles"><polygon class="poly" points="' + pts.map(function (p) { return p[0] + "," + p[1]; }).join(" ") + '"/>';
+    pts.forEach(function (p, i) { var dx = p[0] - cx, dy = p[1] - cy, L = Math.hypot(dx, dy), ux = dx / L, uy = dy / L; s += '<circle class="dot" cx="' + p[0] + '" cy="' + p[1] + '" r="3.5"/><text x="' + (p[0] + ux * 12).toFixed(1) + '" y="' + (p[1] + uy * 16 + 4).toFixed(1) + '" text-anchor="' + (ux > 0.3 ? "start" : ux < -0.3 ? "end" : "middle") + '">' + labs[i] + "</text>"; });
+    return s + '</svg><p class="note">Not drawn to scale.</p>';
+  }
+  var F22 = '<svg class="fig" viewBox="0 0 380 300" role="img" aria-label="Quadrilateral with exterior angles"><defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#2457c5"/></marker></defs>' +
+    '<polygon class="poly" points="110,70 250,130 200,230 110,230"/>' +
+    '<g stroke="#2457c5" stroke-width="2.5" fill="none"><line x1="110" y1="70" x2="55" y2="46" marker-end="url(#ah)"/><line x1="250" y1="130" x2="281" y2="67" marker-end="url(#ah)"/><line x1="200" y1="230" x2="272" y2="230" marker-end="url(#ah)"/><line x1="110" y1="230" x2="110" y2="290" marker-end="url(#ah)"/></g>' +
+    '<path d="M110,208 L132,208 L132,230" fill="none" stroke="#2457c5" stroke-width="2"/>' +
+    '<text x="98" y="100" text-anchor="end">(2x \u2212 24)\u00B0</text><text x="232" y="98" text-anchor="middle">(x + 14)\u00B0</text><text x="226" y="210">x\u00B0</text></svg><p class="note">Not drawn to scale. The small square marks a right angle.</p>';
+  var F23 = shape([[110, 70], [270, 70], [320, 110], [320, 190], [270, 230], [110, 230], [60, 190], [60, 110]], [expr(4, -80), expr(4, -80), expr(2, 50), expr(2, 50), expr(4, -80), expr(4, -80), expr(2, 50), expr(2, 50)]);
+  var F24 = shape([[100, 80], [260, 80], [320, 150], [260, 220], [100, 220], [40, 150]], [expr(3, -20), expr(3, -20), "4x\u00B0", expr(3, -20), expr(3, -20), "4x\u00B0"]);
+
+  // ---------- the eight textbook exercises (17 to 24) ----------
+  var U = "\u00B0";
+  var BANK = [
+    { id: 17, lvl: 0, prompt: "Find the sum of the interior angles and the measure of each angle for the given regular polygon.", fig: poly(10), steps: [
+      { label: "What is the sum of the interior angles?", unit: U, ans: 1440, hint: "Count the sides of the polygon. The sum is (n \u2212 2) \u00D7 180." },
+      { label: "What is the measure of each interior angle?", unit: U, ans: 144, hint: "All the angles of a regular polygon are equal. Divide the sum by the number of sides." }] },
+    { id: 18, lvl: 0, prompt: "Find the sum of the interior angles and the measure of each angle for the given regular polygon.", fig: poly(7), steps: [
+      { label: "What is the sum of the interior angles?", unit: U, ans: 900, hint: "Count the sides of the polygon. The sum is (n \u2212 2) \u00D7 180." },
+      { label: "What is the measure of each interior angle? (Round to the nearest hundredth.)", unit: U, ans: 900 / 7, tol: 0.05, show: "128.57" + U + " (900 \u00F7 7)", hint: "Divide the sum by the number of sides. The answer is not a whole number." }] },
+    { id: 19, lvl: 0, prompt: "How many sides does a regular polygon have if the measure of each interior angle is <b>160\u00B0</b>?", fig: "", steps: [
+      { label: "How many sides does the polygon have?", ans: 18, hint: "Find the exterior angle first: 180 \u2212 160. The exterior angles add up to 360\u00B0, so divide 360 by that number." }] },
+    { id: 20, lvl: 0, prompt: "What is the measure of each exterior angle of a regular polygon with <b>72</b> sides?", fig: "", steps: [
+      { label: "What is the measure of each exterior angle?", unit: U, ans: 5, hint: "The exterior angles of any polygon add up to 360\u00B0. Divide 360 by the number of sides." }] },
+    { id: 21, lvl: 0, prompt: "How many sides does a regular polygon with an exterior angle measure of <b>60\u00B0</b> have?", fig: "", steps: [
+      { label: "How many sides does the polygon have?", ans: 6, hint: "The exterior angles add up to 360\u00B0. Divide 360 by the measure of one exterior angle." }] },
+    { id: 22, lvl: 0, prompt: "What is the value of <b>x</b>? What is the measure of each exterior angle?", fig: F22, steps: [
+      { label: "What is the value of x?", ans: 70, hint: "The exterior angles add up to 360\u00B0, and the right angle's exterior angle is 90\u00B0. Solve 90 + x + (x + 14) + (2x \u2212 24) = 360." },
+      { label: "What is the measure of the exterior angle labeled (2x \u2212 24)\u00B0?", unit: U, ans: 116, hint: "Put your value of x into 2x \u2212 24." },
+      { label: "What is the measure of the exterior angle labeled (x + 14)\u00B0?", unit: U, ans: 84, hint: "Put your value of x into x + 14." }] },
+    { id: 23, lvl: 0, prompt: "Find the value of <b>x</b> and the measure of each interior angle.", fig: F23, steps: [
+      { label: "What is the value of x?", ans: 50, hint: "The interior angles of an octagon add up to 1080\u00B0. Add all eight expressions and set the sum equal to 1080." },
+      { label: "What is the measure of the angle labeled (4x \u2212 80)\u00B0?", unit: U, ans: 120, hint: "Put your value of x into 4x \u2212 80." },
+      { label: "What is the measure of the angle labeled (2x + 50)\u00B0?", unit: U, ans: 150, hint: "Put your value of x into 2x + 50." }] },
+    { id: 24, lvl: 0, prompt: "Find the value of <b>x</b> and the measure of each interior angle.", fig: F24, steps: [
+      { label: "What is the value of x?", ans: 40, hint: "The interior angles of a hexagon add up to 720\u00B0. Add all six expressions and set the sum equal to 720." },
+      { label: "What is the measure of the angle labeled (3x \u2212 20)\u00B0?", unit: U, ans: 100, hint: "Put your value of x into 3x \u2212 20." },
+      { label: "What is the measure of the angle labeled 4x\u00B0?", unit: U, ans: 160, hint: "Put your value of x into 4x." }] }
+  ];
+  function ok(s, raw) {
+    var t = raw.toLowerCase().replace(/[\u2212\u2013]/g, "-").replace(/\u00B0/g, "").replace(/degrees?/g, "").replace(/^\s*x\s*=/, "").trim(), m, v;
+    if ((m = t.match(/^(-?\d+)\s+(\d+)\/(\d+)$/))) v = +m[1] + (+m[2]) / (+m[3]);
+    else if ((m = t.match(/^(-?\d+)\/(\d+)$/))) v = +m[1] / +m[2];
+    else { t = t.replace(/\s+/g, ""); v = t !== "" ? Number(t) : NaN; }
+    return !isNaN(v) && Math.abs(v - s.ans) <= (s.tol || 0);
+  }
+
+  // ---------- state ----------
+  var KEY = "polyEx1724.v1", state = { answers: {}, pos: 0, name: "", autoSent: false };
+  try { var raw = localStorage.getItem(KEY); if (raw) { var sv = JSON.parse(raw); if (sv && sv.answers) state = Object.assign(state, sv); } } catch (e) {}
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+  var ui = { qid: null, msg: "", val: "", focus: false };
+  function cur() { state.pos = Math.max(0, Math.min(N - 1, state.pos)); return BANK[state.pos]; }
+  function ans(q) { return state.answers[q.id] || (state.answers[q.id] = { d: q.steps.map(function () { return 0; }), w: q.steps.map(function () { return 0; }) }); }
+  function complete(q) { var a = state.answers[q.id]; return !!a && a.d.indexOf(0) < 0; }
+  function totals() {
+    var done = 0, right = 0, steps = 0;
+    BANK.forEach(function (q) { var a = state.answers[q.id]; if (!a) return; if (complete(q)) done++; a.d.forEach(function (d, i) { if (d) { steps++; if (a.w[i] === 0) right++; } }); });
+    return { done: done, right: right, steps: steps };
+  }
+
+  // ---------- rendering ----------
+  var $ = function (id) { return document.getElementById(id); };
+  function render() {
+    var q = cur(), a = ans(q); if (ui.qid !== q.id) { ui.qid = q.id; ui.msg = ""; ui.val = ""; }
+    $("qnum").textContent = "Exercise " + q.id; $("level").textContent = LEVELS[q.lvl]; $("prompt").innerHTML = q.prompt; $("fig").innerHTML = q.fig;
+    var fi = a.d.indexOf(0), h = "";
+    q.steps.forEach(function (s, i) {
+      var done = a.d[i], act = i === fi;
+      h += '<div class="row' + (done || act ? "" : " off") + '"><label for="in' + i + '"><b>' + (i + 1) + ".</b> " + s.label + "</label>";
+      if (done) h += a.w[i] === 0 ? '<div class="val">Right \u2713</div>' : '<div class="val no">Wrong \u2717 (you answered ' + esc(a.x && a.x[i] || "") + ")</div>";
+      else h += '<div class="inrow"><input id="in' + i + '" data-i="' + i + '" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="your answer"' + (act ? "" : " disabled") + '>' + (s.unit ? '<span class="unit">' + s.unit + "</span>" : "") + '<button type="button" class="btn go" data-i="' + i + '"' + (act ? "" : " disabled") + ">Submit</button></div>";
+      if (act && ui.msg) h += '<div class="fb bad">' + ui.msg + "</div>";
+      h += "</div>";
+    });
+    if (fi < 0) h += '<div class="done"><div class="fb good"><b>Exercise finished.</b></div>' + (state.pos < N - 1 ? '<button type="button" class="btn" id="next">Next problem</button>' : "<p>That was the last problem.</p>") + "</div>";
+    $("rows").innerHTML = h;
+    var inp = fi >= 0 && $("in" + fi); if (inp) { inp.value = ui.val; if (ui.focus) inp.focus(); }
+    var t = totals();
+    $("stats").innerHTML = '<div class="stat"><b>' + t.done + " / " + N + '</b><span>Finished</span></div><div class="stat"><b>' + t.right + " / " + t.steps + '</b><span>Right</span></div><div class="stat"><b>' + (t.steps ? Math.round(100 * t.right / t.steps) + "%" : "\u2013") + "</b><span>Accuracy</span></div>";
+    var open = BANK.findIndex(function (b) { return !complete(b); }); if (open < 0) open = N - 1;
+    $("map").innerHTML = BANK.map(function (b, i) {
+      var x = state.answers[b.id], cls = "cell";
+      if (complete(b)) cls += x.w.every(function (w) { return w === 0; }) ? " good" : " warn"; else if (x && x.d.indexOf(1) >= 0) cls += " part";
+      if (i === state.pos) cls += " cur";
+      return '<button type="button" class="' + cls + '" data-pos="' + i + '"' + (i > open ? " disabled" : "") + ' aria-label="Problem ' + b.id + '">' + b.id + "</button>";
+    }).join("");
+  }
+  function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function submit(i) {
+    var q = cur(), a = ans(q), inp = $("in" + i), s = q.steps[i]; if (!inp || !inp.value.trim() || a.d[i]) return;
+    a.d[i] = 1; a.x = a.x || []; a.x[i] = inp.value.trim().slice(0, 40);
+    if (!ok(s, inp.value)) a.w[i] = 1;
+    ui.msg = ""; ui.val = ""; ui.focus = true; save(); render();
+  }
+  function go(pos) { state.pos = pos; ui.qid = null; ui.focus = true; save(); render(); window.scrollTo({ top: 0, behavior: "smooth" }); }
+  $("rows").addEventListener("click", function (e) {
+    var g = e.target.closest(".go"); if (g && !g.disabled) return submit(+g.dataset.i);
+    if (e.target.closest("#next")) go(state.pos + 1);
+  });
+  $("rows").addEventListener("keydown", function (e) { if (e.key === "Enter" && e.target.matches("input[data-i]")) { e.preventDefault(); submit(+e.target.dataset.i); } });
+  $("rows").addEventListener("input", function (e) { if (e.target.matches("input[data-i]")) ui.val = e.target.value; });
+  $("map").addEventListener("click", function (e) { var c = e.target.closest(".cell"); if (c && !c.disabled) go(+c.dataset.pos); });
+  render();
+
+  // ---------- results collection (Google Form) ----------
+  var syncEl = $("sync"), nameEl = $("sname"), sendBtn = $("send");
+  nameEl.value = state.name || "";
+  // device code (random, not tied to identity) and active minutes, shown with each result
+  var DEV = (function () { try { var d = localStorage.getItem("deviceCode.v1"); if (!d) { d = Math.random().toString(16).slice(2, 8); localStorage.setItem("deviceCode.v1", d); } return d; } catch (e) { return "none"; } })();
+  var TKEY = KEY + ".sec", activeSec = 0, lastAct = Date.now();
+  try { activeSec = +localStorage.getItem(TKEY) || 0; } catch (e) {}
+  ["pointerdown", "keydown", "input"].forEach(function (ev) { window.addEventListener(ev, function () { lastAct = Date.now(); }, true); });
+  setInterval(function () { if (document.visibilityState === "visible" && Date.now() - lastAct < 60000) { activeSec++; if (activeSec % 10 === 0) { try { localStorage.setItem(TKEY, activeSec); } catch (e) {} } } }, 1000);
+  function extra() { try { localStorage.setItem(TKEY, activeSec); } catch (e) {} return " | device " + DEV + " | " + Math.round(activeSec / 60) + " min active"; }
+  function setSync(t) { syncEl.textContent = t; }
+  // "7:RW" = problem 7, step 1 then step 2. R = right on the first try, W = needed retries, - = not reached yet.
+  function answersString() {
+    return BANK.map(function (q) { var a = state.answers[q.id]; return q.id + ":" + q.steps.map(function (st, i) { return !a || !a.d[i] ? "-" : a.w[i] === 0 ? "R" : "W"; }).join(""); }).join(" ");
+  }
+  function send() {
+    var name = (state.name || "").trim();
+    if (!name) { setSync("Type your name first."); nameEl.focus(); return; }
+    var t = totals(); if (t.steps === 0) { setSync("Finish at least one step first."); return; }
+    if (FORM_URL.indexOf("PASTE") === 0) { setSync("Teacher: connect your Google Form first."); return; }
+    var body = new URLSearchParams();
+    body.set(F_NAME, name); body.set(F_SCORE, t.right + " right of " + t.steps + " steps (" + t.done + " of " + N + " exercises finished)"); body.set(F_ANS, answersString());
+    body.set(F_SCORE, body.get(F_SCORE) + extra());
+    sendBtn.disabled = true; setSync("Sending\u2026");
+    fetch(FORM_URL, { method: "POST", mode: "no-cors", body: body }).then(function () {
+      sendBtn.disabled = false; setSync("Sent to your teacher at " + new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }) + ".");
+    }, function () { sendBtn.disabled = false; setSync("Could not send. Check your internet and try again."); });
+  }
+  sendBtn.addEventListener("click", send);
+  nameEl.addEventListener("input", function () { state.name = nameEl.value; save(); });
+  var _save = save;
+  save = function () {
+    _save(); var t = totals();
+    if (t.done < N) { if (state.autoSent) { state.autoSent = false; _save(); } }
+    else if (!state.autoSent && (state.name || "").trim()) { state.autoSent = true; _save(); send(); }
+  };
+})();
+</script>
+</body>
+</html>
